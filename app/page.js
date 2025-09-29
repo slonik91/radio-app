@@ -13,9 +13,11 @@ export default function Home() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch("/api/playlist", { cache: "no-store" });
+        const res = await fetch("/playlist.json", { cache: "no-store" });
         const data = await res.json();
         setTracks(data.tracks || []);
+      } catch (e) {
+        console.error(e);
       } finally {
         setLoading(false);
       }
@@ -46,11 +48,8 @@ export default function Home() {
   };
 
   const onEnded = () => {
-    if (repeat) {
-      audioRef.current?.play?.();
-    } else {
-      next();
-    }
+    if (repeat) audioRef.current?.play?.();
+    else next();
   };
 
   useEffect(() => {
@@ -60,14 +59,12 @@ export default function Home() {
   return (
     <main style={{ maxWidth: 720, margin: "40px auto", padding: 16, fontFamily: "system-ui, sans-serif" }}>
       <h1 style={{ marginBottom: 8 }}>🎶 Моё онлайн-радио</h1>
-      <p style={{ color: "#666", marginTop: 0 }}>
-        Клади .mp3 в <code>/public/music</code> — они появятся здесь автоматически.
-      </p>
+      <p style={{ color: "#666", marginTop: 0 }}>Клади .mp3 в <code>/public/music</code> — плеер их подхватит при следующей сборке.</p>
 
       {loading && <p>Загрузка плейлиста…</p>}
       {!loading && tracks.length === 0 && (
         <div style={{ padding: 16, border: "1px solid #eee", borderRadius: 12 }}>
-          <p>Нет треков. Добавь файлы в <code>/public/music</code> и перезагрузи страницу.</p>
+          <p>Нет треков. Закинь файлы в <code>/public/music</code> и запусти новый деплой.</p>
         </div>
       )}
 
@@ -93,14 +90,12 @@ export default function Home() {
               <button
                 onClick={() => setShuffle((v) => !v)}
                 style={{ background: shuffle ? "#e5f6ff" : undefined }}
-                title="Случайный порядок"
               >
                 🔀 Shuffle {shuffle ? "ON" : "OFF"}
               </button>
               <button
                 onClick={() => setRepeat((v) => !v)}
                 style={{ background: repeat ? "#e5ffe6" : undefined }}
-                title="Повтор текущего"
               >
                 🔁 Repeat {repeat ? "ON" : "OFF"}
               </button>
@@ -123,7 +118,7 @@ export default function Home() {
                     display: "flex",
                     alignItems: "center",
                     gap: 8,
-                    borderTop: i === 0 ? "none" : "1px solid #f1f1f1",
+                    borderTop: i === 0 ? "none" : "1px solid #f1f1f1"
                   }}
                 >
                   <span style={{ width: 22, textAlign: "center" }}>{i === current ? "▶" : i + 1}</span>
@@ -135,15 +130,9 @@ export default function Home() {
         </>
       )}
       <style jsx global>{`
-        button {
-          padding: 8px 12px;
-          border-radius: 10px;
-          border: 1px solid #ddd;
-          background: #fff;
-          cursor: pointer;
-        }
-        button:hover { background: #f7f7f7; }
-        code { background: #f5f5f5; padding: 2px 6px; border-radius: 6px; }
+        button{padding:8px 12px;border-radius:10px;border:1px solid #ddd;background:#fff;cursor:pointer}
+        button:hover{background:#f7f7f7}
+        code{background:#f5f5f5;padding:2px 6px;border-radius:6px}
       `}</style>
     </main>
   );
